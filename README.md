@@ -34,10 +34,8 @@ Installation
 Clone the repository:
 
 Bash
-git clone https://github.com/your-username/RTL-Fault-Injector.git
 cd RTL-Fault-Injector
 Install dependencies:
-
 Bash
 pip install flask
 Run the application:
