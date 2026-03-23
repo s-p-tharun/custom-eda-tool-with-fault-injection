@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DFT Fault Simulator Pro</title>
+    <style>
+        body { font-family: sans-serif; background: #1a1a1a; color: white; padding: 20px; }
+        .container { display: flex; gap: 20px; }
+        .editor, .results { flex: 1; }
+        textarea { width: 100%; height: 200px; background: #2d2d2d; color: #00ff00; border: 1px solid #444; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #444; padding: 10px; text-align: left; }
+        th { background: #333; }
+        .detected { color: #e74c3c; font-weight: bold; }
+        .golden { color: #2ecc71; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>VLSI DFT Fault Injection Tool</h1>
+    
+    <div class="container">
+        <div class="editor">
+            <form method="POST">
+                <label>Paste Verilog RTL (Module MUST be named 'top'):</label><br>
+                <textarea name="code1">module top(input clk, input rst, input d, output reg q);
+    always @(posedge clk or posedge rst) begin
+        if (rst) q <= 0;
+        else q <= d;
+    end
+endmodule</textarea><br><br>
+                
+                <label>Select Fault Model:</label>
+                <select name="fault_type">
+                    <option value="NONE">None (Golden Run)</option>
+                    <option value="SA0">Stuck-At-0 (SA0)</option>
+                    <option value="SA1">Stuck-At-1 (SA1)</option>
+                </select>
+                <button type="submit" style="padding: 10px 20px; cursor: pointer;">Run DFT Analysis</button>
+            </form>
+            <p><strong>System Log:</strong> {{ log }}</p>
+        </div>
+
+        <div class="results">
+            <h3>DFT Coverage Analytics</h3>
+            <img src="{{ url_for('static', filename='report.png') }}?v=1" alt="Pie Chart" style="max-width: 300px;">
+            
+            <h3>Simulation History (Fault Report)</h3>
+            <table>
+                <tr>
+                    <th>Mode</th>
+                    <th>Status</th>
+                    <th>Est. Coverage</th>
+                </tr>
+                {% for item in history %}
+                <tr>
+                    <td>{{ item.mode }}</td>
+                    <td class="{{ 'golden' if 'PASS' in item.status else 'detected' }}">{{ item.status }}</td>
+                    <td>{{ item.coverage }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</body>
+</html>
